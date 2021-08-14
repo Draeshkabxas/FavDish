@@ -3,4 +3,10 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="splash_screen_title_text_size">50sp</dimen>
+    <dimen name="_16sdp">16dp</dimen>
+    <dimen name="_200sdp">200dp</dimen>
+    <dimen name="_15sdp">15sp</dimen>
+    <dimen name="_20sdp">20dp</dimen>
+
+
 </resources>
