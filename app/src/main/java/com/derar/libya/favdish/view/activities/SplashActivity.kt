@@ -1,4 +1,4 @@
-package com.derar.libya.favdish
+package com.derar.libya.favdish.view.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -12,7 +12,7 @@ import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import com.derar.libya.favdish.databinding.ActivitySplashBinding
 import android.os.Handler
-
+import com.derar.libya.favdish.R
 
 
 @SuppressLint("CustomSplashScreen")
@@ -38,7 +38,7 @@ class SplashActivity : AppCompatActivity() {
             override fun onAnimationStart(p0: Animation?) {}
             override fun onAnimationEnd(p0: Animation?) {
                 Handler(Looper.getMainLooper()).postDelayed({
-                  startActivity(Intent(this@SplashActivity,MainActivity::class.java))
+                  startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                     finish()
                 },1000)
             }
