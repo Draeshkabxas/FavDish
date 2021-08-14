@@ -12,6 +12,7 @@ import com.derar.libya.favdish.databinding.FragmentAllDishesBinding
 import com.derar.libya.favdish.view.activities.AddUpdateDishActivity
 import com.derar.libya.favdish.viewmodel.home.HomeViewModel
 
+
 class AllDishesFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
@@ -53,7 +54,7 @@ class AllDishesFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
             R.id.action_add_dish -> {
-                startActivity(Intent(requireActivity(),AddUpdateDishActivity::class.java))
+                startActivity(Intent(requireActivity(), AddUpdateDishActivity::class.java))
                 return true
             }
         }
