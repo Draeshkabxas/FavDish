@@ -1,11 +1,13 @@
 package com.derar.libya.favdish.view.activities
 
+import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.databinding.ActivityAddUpdateDishBinding
+import com.derar.libya.favdish.databinding.DialogCustomImageSelectionBinding
 
 class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     // END
@@ -36,8 +38,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
 
             R.id.iv_add_dish_image -> {
 
-                Toast.makeText(this@AddUpdateDishActivity, "You have clicked on the ImageView.", Toast.LENGTH_SHORT).show()
-
+               customImageSelectionDialog()
                 return
             }
         }
@@ -58,6 +59,24 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         // END
 
         mBinding.toolbarAddDishActivity.setNavigationOnClickListener { onBackPressed() }
+    }
+
+
+    private fun customImageSelectionDialog(){
+        val dialog = Dialog(this)
+        val binding : DialogCustomImageSelectionBinding =
+            DialogCustomImageSelectionBinding.inflate(layoutInflater)
+        dialog.setContentView(binding.root)
+
+        binding.tvCamera.setOnClickListener {
+            Toast.makeText(this@AddUpdateDishActivity, "camera clicked.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        binding.tvGallery.setOnClickListener {
+            Toast.makeText(this@AddUpdateDishActivity, "gallery clicked.", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
 
