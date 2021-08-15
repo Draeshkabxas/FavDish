@@ -12,8 +12,8 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -34,6 +35,9 @@ import com.bumptech.glide.request.target.Target
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.databinding.ActivityAddUpdateDishBinding
 import com.derar.libya.favdish.databinding.DialogCustomImageSelectionBinding
+import com.derar.libya.favdish.databinding.DialogCustomListBinding
+import com.derar.libya.favdish.view.adapters.CustomListItemAdapter
+import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -42,6 +46,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.single.PermissionListener
+import com.tutorials.eu.favdish.utils.Constants
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -57,6 +62,8 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var getImageFromGallery: ActivityResultLauncher<String?>
     private lateinit var getPhotoFromCamera: ActivityResultLauncher<Void?>
 
+    private lateinit var mCustomListDialog: Dialog
+
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,15 +73,22 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(mBinding.root)
 
 
-            initializeGetImageFromGallery()
-            initializeGetPhotoFromCamera()
+        initializeGetImageFromGallery()
+        initializeGetPhotoFromCamera()
 
 
 
         setupActionBar()
 
         mBinding.ivAddDishImage.setOnClickListener(this@AddUpdateDishActivity)
+
+        mBinding.etType.setOnClickListener(this)
+        mBinding.etCategory.setOnClickListener(this)
+        mBinding.etCookingTime.setOnClickListener(this)
+
+        mBinding.btnAddDish.setOnClickListener(this)
     }
+
     /**
      * initialize getPhotoFromCamera for take photo from camera
      */
@@ -83,8 +97,8 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         getPhotoFromCamera = registerForActivityResult(
             ActivityResultContracts.TakePicturePreview(),
             ActivityResultCallback {
-              setDishImage(it)
-             changeAddDishImageToEditImage()
+                setDishImage(it)
+                changeAddDishImageToEditImage()
             }
         )
     }
@@ -94,7 +108,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun changeAddDishImageToEditImage() {
         mBinding.ivAddDishImage.setImageDrawable(
-            ContextCompat.getDrawable(this@AddUpdateDishActivity,R.drawable.ic_vector_edit)
+            ContextCompat.getDrawable(this@AddUpdateDishActivity, R.drawable.ic_vector_edit)
         )
     }
 
@@ -103,9 +117,9 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun lunchGetPhotoFromCamera() {
         try {
-          getPhotoFromCamera.launch(null)
+            getPhotoFromCamera.launch(null)
         } catch (e: Exception) {
-            Log.e("getImage","${e.message}")
+            Log.e("getImage", "${e.message}")
             Toast.makeText(
                 this,
                 "Failed to load the image from gallery.",
@@ -113,6 +127,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
             ).show()
         }
     }
+
     /**
      * initialize GetImageFromGallery for get image from the gallery
      */
@@ -123,7 +138,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
             ActivityResultCallback {
 
                 //Get dish image from gallery and make id DishImage
-               setDishImage(it)
+                setDishImage(it)
 
                 //Set add_dish to be edit_dish
                 changeAddDishImageToEditImage()
@@ -181,7 +196,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         try {
             getImageFromGallery.launch("image/*")
         } catch (e: Exception) {
-            Log.e("getImage","${e.message}")
+            Log.e("getImage", "${e.message}")
             Toast.makeText(
                 this,
                 "Failed to load the image from gallery.",
@@ -195,11 +210,92 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
         when (v.id) {
 
             R.id.iv_add_dish_image -> {
-
                 customImageSelectionDialog()
                 return
             }
+
+            R.id.et_category ->{
+                customItemsListDialog(
+                    resources.getString(R.string.title_select_dish_category),
+                    Constants.dishCategories(),
+                    Constants.DISH_CATEGORY)
+                return
+            }
+            R.id.et_type->{
+                customItemsListDialog(
+                    resources.getString(R.string.title_select_dish_type),
+                    Constants.dishTypes(),
+                    Constants.DISH_TYPE)
+                return
+            }
+            R.id.et_cooking_time ->{
+                customItemsListDialog(
+                    resources.getString(R.string.title_select_dish_cooking_time),
+                    Constants.dishCookTime(),
+                    Constants.DISH_COOKING_TIME)
+
+                return
+            }
+
+            R.id.btn_add_dish ->{
+
+                /**
+                 * Wrap each entry with its error for show the error if the entry is empty
+                 */
+                val title = mBinding.etTitle.text.toString().trim { it <= ' ' } to
+                        resources.getString(R.string.err_msg_enter_dish_title)
+                val type= mBinding.etType.text.toString().trim { it <= ' ' } to
+                        resources.getString(R.string.err_msg_select_dish_type)
+                val category = mBinding.etCategory.text.toString().trim { it <= ' ' }to
+                        resources.getString(R.string.err_msg_select_dish_category)
+                val cookingTime= mBinding.etCookingTime.text.toString().trim { it <= ' ' }to
+                        resources.getString(R.string.err_msg_select_dish_cooking_time)
+                val directionToCook = mBinding.etDirectionToCook.text.toString().trim { it <= ' ' }to
+                        resources.getString(R.string.err_msg_enter_dish_cooking_instructions)
+                val ingredients = mBinding.etIngredients.text.toString().trim { it <= ' ' }to
+                        resources.getString(R.string.err_msg_enter_dish_ingredients)
+                val image = mImagePath to resources.getString(R.string.err_msg_select_dish_image)
+
+                /**
+                 * Add all entries to dishDetailsWithMassageError
+                 */
+                val dishDetailsWithMassageError = mapOf<String,String>(
+                    title,
+                    type,
+                    category,
+                    cookingTime,
+                    directionToCook,
+                    ingredients,
+                    image
+                )
+
+                /**
+                 * check if all entries not empty then save the dish
+                 * if any entry is empty show its error as toast to user
+                 */
+                if (checkMissingDishDetails(dishDetailsWithMassageError)){
+                    Snackbar.make(findViewById(android.R.id.content), "All the entries are valid",
+                        Snackbar.LENGTH_LONG).show()
+                }
+            }
         }
+    }
+    /**
+     * check if passed all map keys not empty
+     * if all not empty the return true
+     * if any key is empty show its value as toast to user and return false
+     * @param map the map that will check
+     */
+    private fun checkMissingDishDetails(map:Map<String,String>):Boolean{
+        var result:Boolean =true
+       map.forEach { item ->
+           if (TextUtils.isEmpty(item.key)){
+               Toast.makeText(this,item.value,Toast.LENGTH_SHORT).show()
+               result =false
+               return@forEach
+           }
+       }
+        return result
     }
 
     /**
@@ -241,9 +337,9 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                 .withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                         // Here after all the permission are granted launch the CAMERA to capture an image.
-                        report?.let{
+                        report?.let {
                             if (report.areAllPermissionsGranted()) {
-                               lunchGetPhotoFromCamera()
+                                lunchGetPhotoFromCamera()
                             }
                         }
 
@@ -339,7 +435,7 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
      *
      * @param bitmap
      */
-    private fun Bitmap.saveImageToInternalStorage():String {
+    private fun Bitmap.saveImageToInternalStorage(): String {
         // Get the context wrapper instance
         val wrapper = ContextWrapper(applicationContext)
 
@@ -377,9 +473,56 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
+    fun selectedListItem(
+        item:String  , selection: String
+    ) {
+        mCustomListDialog.dismiss()
+        when (selection) {
+            Constants.DISH_TYPE -> {
+                mBinding.etType.setText(item)
+            }
 
-    companion object{
+            Constants.DISH_CATEGORY -> {
+                mBinding.etCategory.setText(item)
+            }
+            Constants.DISH_COOKING_TIME -> {
+                mBinding.etCookingTime.setText(item)
+            }
+        }
+    }
+
+
+    /**
+     * A function to launch the custom list dialog.
+     *
+     * @param title - Define the title at runtime according to the list items.
+     * @param itemsList - List of items to be selected.
+     * @param selection - By passing this param you can identify the list item selection.
+     */
+    private fun customItemsListDialog(title: String, itemsList: List<String>, selection: String) {
+        mCustomListDialog = Dialog(this@AddUpdateDishActivity)
+
+        val binding: DialogCustomListBinding = DialogCustomListBinding.inflate(layoutInflater)
+
+        /*Set the screen content from a layout resource.
+        The resource will be inflated, adding all top-level views to the screen.*/
+        mCustomListDialog.setContentView(binding.root)
+
+        binding.tvTitle.text = title
+
+        // Set the LayoutManager that this RecyclerView will use.
+        binding.rvList.layoutManager = LinearLayoutManager(this@AddUpdateDishActivity)
+        // Adapter class is initialized and list is passed in the param.
+        val adapter = CustomListItemAdapter(this@AddUpdateDishActivity, itemsList, selection)
+        // adapter instance is set to the recyclerview to inflate the items.
+        binding.rvList.adapter = adapter
+        //Start the dialog and display it on screen.
+        mCustomListDialog.show()
+    }
+
+
+    companion object {
         // Declare a constant variable for directory name to store the images.
-        const val IMAGE_DIRECTORY="FavDishImages"
+        const val IMAGE_DIRECTORY = "FavDishImages"
     }
 }
