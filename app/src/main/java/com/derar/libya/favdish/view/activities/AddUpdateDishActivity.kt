@@ -20,6 +20,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -33,10 +34,14 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.derar.libya.favdish.R
+import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.ActivityAddUpdateDishBinding
 import com.derar.libya.favdish.databinding.DialogCustomImageSelectionBinding
 import com.derar.libya.favdish.databinding.DialogCustomListBinding
+import com.derar.libya.favdish.model.entities.FavDish
 import com.derar.libya.favdish.view.adapters.CustomListItemAdapter
+import com.derar.libya.favdish.viewmodel.FavDishViewModel
+import com.derar.libya.favdish.viewmodel.FavDishViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -61,6 +66,10 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var getImageFromGallery: ActivityResultLauncher<String?>
     private lateinit var getPhotoFromCamera: ActivityResultLauncher<Void?>
+
+    private val mFavDishViewModel: FavDishViewModel by viewModels{
+        FavDishViewModelFactory((application as FavDishApplication).repository)
+    }
 
     private lateinit var mCustomListDialog: Dialog
 
@@ -274,8 +283,23 @@ class AddUpdateDishActivity : AppCompatActivity(), View.OnClickListener {
                  * if any entry is empty show its error as toast to user
                  */
                 if (checkMissingDishDetails(dishDetailsWithMassageError)){
-                    Snackbar.make(findViewById(android.R.id.content), "All the entries are valid",
-                        Snackbar.LENGTH_LONG).show()
+                    val favDishDetails:FavDish = FavDish(
+                        image.first,
+                        Constants.DISH_IMAGE_SOURCE_LOCAL,
+                        title.first,
+                        type.first,
+                        category.first,
+                        ingredients.first,
+                        cookingTime.first,
+                        directionToCook.first,
+                        false
+                    )
+                    mFavDishViewModel.insert(favDishDetails)
+                    Toast.makeText(this,
+                        "You successfully added your favorite dish details."
+                        ,Toast.LENGTH_SHORT).show()
+                    Log.d("Insertion","Successfully")
+                    finish()
                 }
             }
         }
