@@ -12,5 +12,7 @@
 
     <dimen name="_20ssdp">20sp</dimen>
     <dimen name="_1sdp">1dp</dimen>
+    <dimen name="_5sdp">5dp</dimen>
+    <dimen name="_120sdp">120dp</dimen>
 
 </resources>

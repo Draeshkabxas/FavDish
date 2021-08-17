@@ -2,17 +2,17 @@ package com.derar.libya.favdish.view.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.FragmentAllDishesBinding
 import com.derar.libya.favdish.view.activities.AddUpdateDishActivity
+import com.derar.libya.favdish.view.adapters.FavDishAdapter
 import com.derar.libya.favdish.viewmodel.FavDishViewModel
 import com.derar.libya.favdish.viewmodel.FavDishViewModelFactory
 import com.derar.libya.favdish.viewmodel.home.HomeViewModel
@@ -22,8 +22,7 @@ import java.lang.StringBuilder
 
 class AllDishesFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
-    private var _binding: FragmentAllDishesBinding? = null
+    private var mBinding: FragmentAllDishesBinding? = null
 
     private val mFavDishViewModel:FavDishViewModel by viewModels{
         FavDishViewModelFactory(
@@ -33,7 +32,7 @@ class AllDishesFragment : Fragment() {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
+    private val binding get() = mBinding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,28 +44,46 @@ class AllDishesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
 
-        _binding = FragmentAllDishesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        mBinding = FragmentAllDishesBinding.inflate(inflater, container, false)
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-        return root
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        /** Set recycle view layout manager to be grid layout */
+        mBinding?.rvDishesList?.layoutManager = GridLayoutManager(requireActivity(),2)
+
+        /** set recycle view adapter to be fav dish adapter */
+        val favDishAdapter= FavDishAdapter(this@AllDishesFragment)
+        mBinding?.rvDishesList?.adapter = favDishAdapter
+
+        /**
+         * When data change check if dishes list is not empty
+         * if it is then set recycleView to be visible
+         * and no dishes added text view to be gone
+         * finally set dishes list to the adapter
+         *
+         * if not then set recycleView to be gone
+         * and no dishes added text view to be visible
+         */
         mFavDishViewModel.allDishesList.observe(viewLifecycleOwner, Observer {dishes->
-            dishes?.let {dishesList->
-                var result:StringBuilder = StringBuilder()
-                dishesList.forEach { favDishItem->
-                    result.append("Dish Title: ${favDishItem.id} :: ${favDishItem.title} \n")
+            dishes.let { dishesList->
+                var result:String  = " "
+                if (dishesList.isNotEmpty()) {
+                    mBinding?.rvDishesList?.visibility = View.VISIBLE
+                    mBinding?.tvNoDishesAddedYet?.visibility = View.GONE
+                    result+= dishesList[0]
+                    favDishAdapter.dishesList(dishesList)
+                } else{
+                    mBinding?.rvDishesList?.visibility = View.GONE
+                    mBinding?.tvNoDishesAddedYet?.visibility = View.VISIBLE
+                    result+="No Data"
                 }
-                Snackbar.make(view,result.toString(),Snackbar.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), result ,Toast.LENGTH_LONG).show()
             }
 
         })
@@ -90,6 +107,6 @@ class AllDishesFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        mBinding = null
     }
 }
