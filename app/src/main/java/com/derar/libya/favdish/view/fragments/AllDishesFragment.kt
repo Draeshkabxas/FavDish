@@ -72,18 +72,14 @@ class AllDishesFragment : Fragment() {
          */
         mFavDishViewModel.allDishesList.observe(viewLifecycleOwner, Observer {dishes->
             dishes.let { dishesList->
-                var result:String  = " "
                 if (dishesList.isNotEmpty()) {
                     mBinding?.rvDishesList?.visibility = View.VISIBLE
                     mBinding?.tvNoDishesAddedYet?.visibility = View.GONE
-                    result+= dishesList[0]
                     favDishAdapter.dishesList(dishesList)
                 } else{
                     mBinding?.rvDishesList?.visibility = View.GONE
                     mBinding?.tvNoDishesAddedYet?.visibility = View.VISIBLE
-                    result+="No Data"
                 }
-                Toast.makeText(requireContext(), result ,Toast.LENGTH_LONG).show()
             }
 
         })
