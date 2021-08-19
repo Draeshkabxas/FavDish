@@ -30,5 +30,10 @@
         android:id="@+id/dishDetailsFragment"
         android:name="com.derar.libya.favdish.view.fragments.DishDetailsFragment"
         android:label="@string/title_dish_details"
-        tools:layout="@layout/fragment_dish_details" />
+        tools:layout="@layout/fragment_dish_details" >
+
+        <argument
+            android:name="dishDetails"
+            app:argType="com.derar.libya.favdish.model.entities.FavDish" />
+    </fragment>
 </navigation>

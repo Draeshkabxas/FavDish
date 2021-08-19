@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.FragmentAllDishesBinding
+import com.derar.libya.favdish.model.entities.FavDish
 import com.derar.libya.favdish.view.activities.AddUpdateDishActivity
 import com.derar.libya.favdish.view.activities.MainActivity
 import com.derar.libya.favdish.view.adapters.FavDishAdapter
@@ -69,7 +70,7 @@ class AllDishesFragment : Fragment() {
     /**
      * A function to navigate to the Dish Details Fragment.
      */
-    fun dishDetails(){
+    fun dishDetails(favDish: FavDish){
 
         // TODO Step 9: Call the hideBottomNavigationView function when user wants to navigate to the DishDetailsFragment.
         // START
@@ -79,7 +80,9 @@ class AllDishesFragment : Fragment() {
         // END
 
         findNavController()
-            .navigate(AllDishesFragmentDirections.actionNavigationAllDishesToDishDetailsFragment())
+            .navigate(AllDishesFragmentDirections.actionNavigationAllDishesToDishDetailsFragment(
+                favDish
+            ))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

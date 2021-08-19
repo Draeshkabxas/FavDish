@@ -44,7 +44,7 @@ class FavDishAdapter(
         holder.tvDishTitle.text = dish.title
         holder.itemView.setOnClickListener{
             if(fragment is AllDishesFragment){
-                fragment.dishDetails()
+                fragment.dishDetails(dish)
             }
         }
 
