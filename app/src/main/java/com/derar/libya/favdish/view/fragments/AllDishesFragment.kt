@@ -13,6 +13,7 @@ import com.derar.libya.favdish.R
 import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.FragmentAllDishesBinding
 import com.derar.libya.favdish.view.activities.AddUpdateDishActivity
+import com.derar.libya.favdish.view.activities.MainActivity
 import com.derar.libya.favdish.view.adapters.FavDishAdapter
 import com.derar.libya.favdish.viewmodel.FavDishViewModel
 import com.derar.libya.favdish.viewmodel.FavDishViewModelFactory
@@ -54,10 +55,31 @@ class AllDishesFragment : Fragment() {
     }
 
 
+    // TODO Step 10: Override the onResume method and call the function to show the BottomNavigationView when user is on the AllDishesFragment.
+    // START
+    override fun onResume() {
+        super.onResume()
+
+        if(requireActivity() is MainActivity){
+            (activity as MainActivity?)!!.showBottomNavigationView()
+        }
+    }
+    // END
+
+    /**
+     * A function to navigate to the Dish Details Fragment.
+     */
     fun dishDetails(){
-     findNavController().navigate(
-         AllDishesFragmentDirections.actionNavigationAllDishesToDishDetailsFragment()
-     )
+
+        // TODO Step 9: Call the hideBottomNavigationView function when user wants to navigate to the DishDetailsFragment.
+        // START
+        if(requireActivity() is MainActivity){
+            (activity as MainActivity?)!!.hideBottomNavigationView()
+        }
+        // END
+
+        findNavController()
+            .navigate(AllDishesFragmentDirections.actionNavigationAllDishesToDishDetailsFragment())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
