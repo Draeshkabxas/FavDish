@@ -3,6 +3,7 @@ package com.derar.libya.favdish.model.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.derar.libya.favdish.model.entities.FAV_DISH_TABLE_NAME
 import com.derar.libya.favdish.model.entities.FavDish
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,8 @@ interface FavDishDao {
     @Insert
     suspend fun insertFavDishDetails(favDish: FavDish)
 
+    @Update
+    suspend fun updateFavDishDetails(favDish:FavDish)
 
 
 
