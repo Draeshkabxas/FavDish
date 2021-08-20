@@ -67,9 +67,11 @@ dependencies {
 
 
 
+    //Palette
+    //noinspection GradleCompatible
+    implementation 'com.android.support:palette-v7:28.0.0'
 
-
-    // TODO Step 3: Add all the required dependencies libraries few of them is added already by Android Studio while creating the project with BottomNavigationActivity.
+    //  Step 3: Add all the required dependencies libraries few of them is added already by Android Studio while creating the project with BottomNavigationActivity.
     // START
     // Room components
     // Reference Link: https://developer.android.com/training/data-storage/room

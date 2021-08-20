@@ -1,17 +1,23 @@
 package com.derar.libya.favdish.view.fragments
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.graphics.drawable.toBitmap
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.databinding.FragmentDishDetailsBinding
 import java.io.IOException
-import java.util.*
 
 
 class DishDetailsFragment : Fragment() {
@@ -20,10 +26,6 @@ class DishDetailsFragment : Fragment() {
     // START
     private var mBinding: FragmentDishDetailsBinding? = null
     // END
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-   }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +50,37 @@ class DishDetailsFragment : Fragment() {
                 Glide.with(requireActivity())
                     .load(dish.dishDetails.image)
                     .centerCrop()
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            Log.e("Tag", "Error Loading an Image.")
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            resource?.let {
+                                // Step 3: Generate the Palette and set the vibrantSwatch as the background of the view.
+                                // START
+                                Palette.from(resource.toBitmap())
+                                    .generate { palette ->
+                                        val intColor = palette?.vibrantSwatch?.rgb ?: 0
+                                        mBinding!!.rlDishDetailMain.setBackgroundColor(intColor)
+                                    }
+                            }
+                                // END
+                            return false
+                        }
+                    })
                     .into(mBinding!!.ivDishImage)
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -55,14 +88,17 @@ class DishDetailsFragment : Fragment() {
 
             mBinding!!.tvTitle.text = dish.dishDetails.title
             mBinding!!.tvType.text =
-                dish.dishDetails.type.replaceFirstChar { firstChar->
+                dish.dishDetails.type.replaceFirstChar { firstChar ->
                     firstChar.uppercase()
                 } // Used to make first letter capital
             mBinding!!.tvCategory.text = dish.dishDetails.category
             mBinding!!.tvIngredients.text = dish.dishDetails.ingredients
             mBinding!!.tvCookingDirection.text = dish.dishDetails.directionToCook
             mBinding!!.tvCookingTime.text =
-                resources.getString(R.string.lbl_estimate_cooking_time, dish.dishDetails.cookingTime)
+                resources.getString(
+                    R.string.lbl_estimate_cooking_time,
+                    dish.dishDetails.cookingTime
+                )
         }
         // END
     }
