@@ -1,11 +1,15 @@
 package com.derar.libya.favdish.view.adapters
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.derar.libya.favdish.R
 import com.derar.libya.favdish.databinding.ItemDishLayoutBinding
 import com.derar.libya.favdish.model.entities.FavDish
 import com.derar.libya.favdish.view.fragments.AllDishesFragment
@@ -19,10 +23,11 @@ class FavDishAdapter(
 
 
     class ViewHolder(
-        private val mBinding:ItemDishLayoutBinding
+        mBinding:ItemDishLayoutBinding
     ):RecyclerView.ViewHolder(mBinding.root) {
         val ivDishImage=mBinding.ivDishImage
         val tvDishTitle=mBinding.tvDishTitle
+        val ibMore =mBinding.ibMore
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,7 +58,39 @@ class FavDishAdapter(
                 }
             }
         }
+        //  Step 7: We want the menu icon should be visible only in the AllDishesFragment not in the FavoriteDishesFragment so add the below to achieve it.
+        // START
+        if (fragment is AllDishesFragment) {
+            holder.ibMore.visibility = View.VISIBLE
+        } else if (fragment is FavoriteDishesFragment) {
+            holder.ibMore.visibility = View.GONE
+        }
+        // END
 
+        //  Step 6: Assign the click event to the ib_more icon and Popup the menu items.
+        // START
+        holder.ibMore.setOnClickListener {
+            val popup = PopupMenu(fragment.context, it)
+            //Inflating the Popup using xml file
+            popup.menuInflater.inflate(R.menu.menu_adapter, popup.menu)
+
+            //  Step 8: Assign the click event to the menu items as below and print the Log or You can display the Toast message for now.
+            // START
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit_dish -> {
+                        Log.i("You have clicked on", "Edit Option of ${dish.title}")
+                    }
+                    R.id.action_delete_dish -> {
+                        Log.i("You have clicked on", "Delete Option of ${dish.title}")
+                    }
+                }
+                true
+            }
+            // END
+
+            popup.show() //showing popup menu
+        }
     }
 
     override fun getItemCount(): Int =dishes.size

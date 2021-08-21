@@ -66,4 +66,8 @@
 
     <string name="msg_removed_from_favorite">You have removed the dish from your favorites.</string>
     <string name="label_no_favorite_dishes_added_yet">No favorite dishes added yet!!!</string>
+
+    <string name="action_edit_dish">EDIT DISH</string>
+
+    <string name="action_delete_dish">DELETE DISH</string>
 </resources>
