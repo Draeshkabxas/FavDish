@@ -56,7 +56,7 @@ class AllDishesFragment : Fragment() {
     }
 
 
-    // TODO Step 10: Override the onResume method and call the function to show the BottomNavigationView when user is on the AllDishesFragment.
+    //  Step 10: Override the onResume method and call the function to show the BottomNavigationView when user is on the AllDishesFragment.
     // START
     override fun onResume() {
         super.onResume()

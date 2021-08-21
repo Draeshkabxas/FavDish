@@ -6,9 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.FragmentFavoriteDishesBinding
+import com.derar.libya.favdish.model.entities.FavDish
+import com.derar.libya.favdish.view.activities.MainActivity
 import com.derar.libya.favdish.view.adapters.FavDishAdapter
 import com.derar.libya.favdish.viewmodel.FavDishViewModel
 import com.derar.libya.favdish.viewmodel.FavDishViewModelFactory
@@ -73,6 +76,36 @@ class FavoriteDishesFragment : Fragment() {
         }
 
     }
+
+
+    /**
+     * A function to navigate to the Dish Details Fragment.
+     */
+    fun dishDetails(favDish: FavDish){
+
+        // TODO Step 9: Call the hideBottomNavigationView function when user wants to navigate to the DishDetailsFragment.
+        // START
+        if(requireActivity() is MainActivity){
+            (activity as MainActivity?)!!.hideBottomNavigationView()
+        }
+        // END
+
+        findNavController()
+            .navigate(FavoriteDishesFragmentDirections.actionNavigationFavoriteDishesToDishDetailsFragment(
+                favDish
+            ))
+    }
+
+    //  Step 10: Override the onResume method and call the function to show the BottomNavigationView when user is on the AllDishesFragment.
+    // START
+    override fun onResume() {
+        super.onResume()
+
+        if(requireActivity() is MainActivity){
+            (activity as MainActivity?)!!.showBottomNavigationView()
+        }
+    }
+    // END
 
     override fun onDestroyView() {
         super.onDestroyView()

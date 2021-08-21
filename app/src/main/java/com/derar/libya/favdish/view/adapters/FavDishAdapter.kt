@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.derar.libya.favdish.databinding.ItemDishLayoutBinding
 import com.derar.libya.favdish.model.entities.FavDish
 import com.derar.libya.favdish.view.fragments.AllDishesFragment
+import com.derar.libya.favdish.view.fragments.FavoriteDishesFragment
 
 class FavDishAdapter(
     private val fragment: Fragment
@@ -43,8 +44,13 @@ class FavDishAdapter(
         // Set tvDishTitle the to be dish title
         holder.tvDishTitle.text = dish.title
         holder.itemView.setOnClickListener{
-            if(fragment is AllDishesFragment){
-                fragment.dishDetails(dish)
+            when (fragment) {
+                is AllDishesFragment -> {
+                    fragment.dishDetails(dish)
+                }
+                is FavoriteDishesFragment -> {
+                    fragment.dishDetails(dish)
+                }
             }
         }
 
