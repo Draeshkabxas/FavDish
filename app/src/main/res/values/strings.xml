@@ -65,4 +65,5 @@
     <string name="msg_added_to_favorites">You have added the dish to your favorites.</string>
 
     <string name="msg_removed_from_favorite">You have removed the dish from your favorites.</string>
+    <string name="label_no_favorite_dishes_added_yet">No favorite dishes added yet!!!</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.derar.libya.favdish.model.entities.FAVORITE_DISH_NAME
 import com.derar.libya.favdish.model.entities.FAV_DISH_TABLE_NAME
 import com.derar.libya.favdish.model.entities.FavDish
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,8 @@ interface FavDishDao {
     @Update
     suspend fun updateFavDishDetails(favDish:FavDish)
 
+    @Query("SELECT * FROM $FAV_DISH_TABLE_NAME WHERE $FAVORITE_DISH_NAME = 1")
+    fun getFavoriteDishesList():Flow<List<FavDish>>
 
 
 }

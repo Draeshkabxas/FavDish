@@ -24,6 +24,10 @@ class FavDishViewModel(
             repository.updateFavDishData(dish)
         }
 
+    val favoriteDishesList: LiveData<List<FavDish>> =
+        repository.favoriteDishesList.asLiveData()
+
+
 }
 
 
