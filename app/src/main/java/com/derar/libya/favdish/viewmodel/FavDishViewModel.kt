@@ -27,7 +27,10 @@ class FavDishViewModel(
     val favoriteDishesList: LiveData<List<FavDish>> =
         repository.favoriteDishesList.asLiveData()
 
-
+    fun delete(dish:FavDish) =
+        viewModelScope.launch{
+            repository.deleteFavDishData(dish)
+        }
 }
 
 

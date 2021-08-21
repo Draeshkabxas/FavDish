@@ -88,7 +88,12 @@ class FavDishAdapter(
 
                     }
                     R.id.action_delete_dish -> {
-                        Log.i("You have clicked on", "Delete Option of ${dish.title}")
+                        // Step 6: Remove the log and call the function that we have created to delete.
+                        // START
+                        if (fragment is AllDishesFragment) {
+                            fragment.deleteDish(dish)
+                        }
+                        // END
                     }
                 }
                 true
