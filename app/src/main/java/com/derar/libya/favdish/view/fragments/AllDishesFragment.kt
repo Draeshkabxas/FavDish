@@ -3,6 +3,7 @@ package com.derar.libya.favdish.view.fragments
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -38,6 +39,9 @@ class AllDishesFragment : Fragment() {
             (requireActivity().application as FavDishApplication).repository
         )
     }
+
+    private lateinit var mFavDishAdapter:FavDishAdapter
+    private lateinit var mCustomListDialog:Dialog
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -131,8 +135,10 @@ class AllDishesFragment : Fragment() {
         mBinding?.rvDishesList?.layoutManager = GridLayoutManager(requireActivity(),2)
 
         /** set recycle view adapter to be fav dish adapter */
-        val favDishAdapter= FavDishAdapter(this@AllDishesFragment)
-        mBinding?.rvDishesList?.adapter = favDishAdapter
+        mFavDishAdapter= FavDishAdapter(this@AllDishesFragment)
+        mBinding?.rvDishesList?.adapter =mFavDishAdapter
+
+
 
         /**
          * When data change check if dishes list is not empty
@@ -144,17 +150,7 @@ class AllDishesFragment : Fragment() {
          * and no dishes added text view to be visible
          */
         mFavDishViewModel.allDishesList.observe(viewLifecycleOwner, Observer {dishes->
-            dishes.let { dishesList->
-                if (dishesList.isNotEmpty()) {
-                    mBinding?.rvDishesList?.visibility = View.VISIBLE
-                    mBinding?.tvNoDishesAddedYet?.visibility = View.GONE
-                    favDishAdapter.dishesList(dishesList)
-                } else{
-                    mBinding?.rvDishesList?.visibility = View.GONE
-                    mBinding?.tvNoDishesAddedYet?.visibility = View.VISIBLE
-                }
-            }
-
+            setDishesDataOrShowNoData(dishes)
         })
     }
 
@@ -165,13 +161,13 @@ class AllDishesFragment : Fragment() {
      * A function to launch the custom dialog.
      */
     private fun filterDishesListDialog() {
-        val customListDialog = Dialog(requireActivity())
+         mCustomListDialog= Dialog(requireActivity())
 
         val binding: DialogCustomListBinding = DialogCustomListBinding.inflate(layoutInflater)
 
         /*Set the screen content from a layout resource.
         The resource will be inflated, adding all top-level views to the screen.*/
-        customListDialog.setContentView(binding.root)
+        mCustomListDialog.setContentView(binding.root)
 
         binding.tvTitle.text = resources.getString(R.string.title_select_item_to_filter)
 
@@ -184,13 +180,14 @@ class AllDishesFragment : Fragment() {
         // Adapter class is initialized and list is passed in the param.
         val adapter = CustomListItemAdapter(
             requireActivity(),
+            this@AllDishesFragment,
             dishTypes,
             Constants.FILTER_SELECTION
         )
         // adapter instance is set to the recyclerview to inflate the items.
         binding.rvList.adapter = adapter
         //Start the dialog and display it on screen.
-        customListDialog.show()
+        mCustomListDialog.show()
     }
     // END
 
@@ -218,4 +215,52 @@ class AllDishesFragment : Fragment() {
         super.onDestroyView()
         mBinding = null
     }
-}
+
+    // Step 5: Create a function to get the filter item selection and get the list from database accordingly.
+    // START
+    /**
+     * A function to get the filter item selection and get the list from database accordingly.
+     *
+     * @param filterItemSelection
+     */
+    fun filterSelection(filterItemSelection: String) {
+
+        mCustomListDialog.dismiss()
+
+        Log.i("Filter Selection", filterItemSelection)
+
+        if (filterItemSelection == Constants.ALL_ITEMS) {
+            mFavDishViewModel.allDishesList.observe(viewLifecycleOwner) { dishes ->
+                setDishesDataOrShowNoData(dishes)
+            }
+        } else {
+            mFavDishViewModel.getFilteredList(filterItemSelection).observe(viewLifecycleOwner){dishes->
+                setDishesDataOrShowNoData(dishes)
+            }
+            Log.i("Filter List", "Get Filter List")
+        }
+    }
+    // END
+    /**
+     * Set function set passed dishes data to the adapter
+     * but if the data is empty show no data yet text
+     * @param dishes the dishes that will be set to the adapter
+     */
+    private fun setDishesDataOrShowNoData(dishes:List<FavDish>){
+        dishes.let {
+            if (it.isNotEmpty()) {
+
+                mBinding!!.rvDishesList.visibility = View.VISIBLE
+                mBinding!!.tvNoDishesAddedYet.visibility = View.GONE
+
+                mFavDishAdapter.dishesList(it)
+            } else {
+
+                mBinding!!.rvDishesList.visibility = View.GONE
+                mBinding!!.tvNoDishesAddedYet.visibility = View.VISIBLE
+            }
+        }
+    }
+   }
+
+

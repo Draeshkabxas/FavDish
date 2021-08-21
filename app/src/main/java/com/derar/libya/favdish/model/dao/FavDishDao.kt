@@ -27,4 +27,7 @@ interface FavDishDao {
     @Delete
     suspend fun deleteFavDishDetails(favDish:FavDish)
 
+    @Query("SELECT * FROM $FAV_DISH_TABLE_NAME WHERE type= :filterType")
+     fun getFilterDishesList(filterType:String):Flow<List<FavDish>>
+
 }
