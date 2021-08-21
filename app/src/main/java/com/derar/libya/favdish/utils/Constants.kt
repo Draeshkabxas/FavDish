@@ -1,6 +1,6 @@
-package com.tutorials.eu.favdish.utils
+package com.derar.libya.favdish.utils
 
-// TODO Step 1: Create a Constants object in the utils package and define the constant values.
+//  Step 1: Create a Constants object in the utils package and define the constant values.
 /**
  * This is used to define the constant values that we can use throughout the application.
  */
@@ -13,7 +13,10 @@ object Constants {
     const val DISH_IMAGE_SOURCE_LOCAL:String = "Local"
     const val DISH_IMAGE_SOURCE_ONLINE:String = "Online"
 
-    // TODO Step 2: Define the Dish Types list items.
+    const val EXTRA_DISH_DETAILS:String = "DishDetails"
+
+
+    //  Step 2: Define the Dish Types list items.
     // START
     /**
      * This function will return the Dish Type List items.
@@ -32,7 +35,7 @@ object Constants {
     }
     // END
 
-    // TODO Step 3: Define the Dish Category list items.
+    //  Step 3: Define the Dish Category list items.
     // START
     /**
      *  This function will return the Dish Category list items.
@@ -58,7 +61,7 @@ object Constants {
     // END
 
 
-    // TODO Step 4: Define the Dish Cooking Time list items.
+    //  Step 4: Define the Dish Cooking Time list items.
     // START
     /**
      *  This function will return the Dish Cooking Time list items. The time added is in Minutes.

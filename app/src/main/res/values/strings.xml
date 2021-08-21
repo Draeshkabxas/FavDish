@@ -70,4 +70,10 @@
     <string name="action_edit_dish">EDIT DISH</string>
 
     <string name="action_delete_dish">DELETE DISH</string>
+    <string name="title_add_dish">Add Dish</string>
+
+    <string name="title_edit_dish">Edit Dish</string>
+
+    <string name="lbl_update_dish">UPDATE DISH</string>
+
 </resources>
