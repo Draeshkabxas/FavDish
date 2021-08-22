@@ -1,11 +1,12 @@
 package com.derar.libya.favdish.view.fragments
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -21,6 +22,8 @@ import com.bumptech.glide.request.target.Target
 import com.derar.libya.favdish.R
 import com.derar.libya.favdish.application.FavDishApplication
 import com.derar.libya.favdish.databinding.FragmentDishDetailsBinding
+import com.derar.libya.favdish.model.entities.FavDish
+import com.derar.libya.favdish.utils.Constants
 import com.derar.libya.favdish.viewmodel.FavDishViewModel
 import com.derar.libya.favdish.viewmodel.FavDishViewModelFactory
 import java.io.IOException
@@ -33,9 +36,19 @@ class DishDetailsFragment : Fragment() {
     private var mBinding: FragmentDishDetailsBinding? = null
     // END
 
+    private var mFavDishDetails : FavDish? = null
+
     private val mFavDishViewModel : FavDishViewModel by viewModels {
       FavDishViewModelFactory(((requireActivity().application) as FavDishApplication).repository)
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        /** set menu */
+        setHasOptionsMenu(true)
+
+        super.onCreate(savedInstanceState)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +57,8 @@ class DishDetailsFragment : Fragment() {
         // Step 8: Initialize the mBinding variable.
         // START
         mBinding = FragmentDishDetailsBinding.inflate(inflater, container, false)
+
+
         return mBinding!!.root
         // END
     }
@@ -51,6 +66,8 @@ class DishDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val args: DishDetailsFragmentArgs by navArgs()
+
+        mFavDishDetails = args.dishDetails
         // Step 10: Remove the log and populate the data to UI.
         // START
         args.let { dish ->
@@ -103,7 +120,8 @@ class DishDetailsFragment : Fragment() {
                 } // Used to make first letter capital
             mBinding!!.tvCategory.text = dish.dishDetails.category
             mBinding!!.tvIngredients.text = dish.dishDetails.ingredients
-            mBinding!!.tvCookingDirection.text = dish.dishDetails.directionToCook
+            mBinding!!.tvCookingDirection.text =
+                getStringFromHtml(dish.dishDetails.directionToCook)
             mBinding!!.tvCookingTime.text =
                 resources.getString(
                     R.string.lbl_estimate_cooking_time,
@@ -174,6 +192,65 @@ class DishDetailsFragment : Fragment() {
             }
         }
     }
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_share,menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_share_dish -> {
+                val type = "text/plain"
+                val subject = "Check this dish recipe"
+                var extraText = ""
+                val shareWith = "Share With"
+
+                mFavDishDetails?.let {
+                    var image = ""
+                    if (it.imageSource == Constants.DISH_IMAGE_SOURCE_ONLINE) {
+                        image = it.image
+                    }
+
+                    val cookingInstructions =getStringFromHtml(it.directionToCook)
+
+                    extraText =
+                        "$image \n" +
+                                "\n Title:  ${it.title} \n\n Type: ${it.type} \n\n Category: ${it.category}" +
+                                "\n\n Ingredients: \n ${it.ingredients} \n\n Instructions To Cook: \n $cookingInstructions" +
+                                "\n\n Time required to cook the dish approx ${it.cookingTime} minutes."
+                }
+
+
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.type = type
+                intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+                intent.putExtra(Intent.EXTRA_TEXT, extraText)
+                startActivity(Intent.createChooser(intent, shareWith))
+
+            }
+        }
+        return true
+    }
+
+
+    /**
+     * This function gets a string from passed html text
+     * @param htmlText the html text that will be convert to string
+     */
+    fun getStringFromHtml(htmlText:String):String=
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+             Html.fromHtml(
+                htmlText,
+                Html.FROM_HTML_MODE_COMPACT
+            ).toString()
+        } else {
+            @Suppress("DEPRECATION")
+             Html.fromHtml(
+                 htmlText
+            ).toString()
+        }
 
     //  Step 9: Override the onDestroy function to make the mBinding null that is avoid the memory leaks. This we have not done before because the AllDishesFragment because when in it the onDestroy function is called the app is killed. But this is the good practice to do it.
     // START
