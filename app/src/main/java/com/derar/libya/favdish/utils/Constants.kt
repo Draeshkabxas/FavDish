@@ -38,6 +38,11 @@ object Constants {
     const val NUMBER_VALUE: Int = 1
     // END
 
+    //Notifications
+    const val NOTIFICATION_ID= "FavDish_notification_id"
+    const val NOTIFICATION_NAME= "FavDish"
+    const val NOTIFICATION_CHANNEL= "FavDish_channel_01"
+
 
     //  Step 2: Define the Dish Types list items.
     // START
